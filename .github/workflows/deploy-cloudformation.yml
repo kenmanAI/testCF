@@ -1,0 +1,125 @@
+name: Deploy CloudFormation Stack
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-4
+
+      - name: Deploy CloudFormation stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: webserver-stack
+          template: webserver-stack.yaml
+          no-fail-on-empty-changeset: "1"
+          
+      - name: Get CloudFormation stack outputs
+        id: get-outputs
+        run: |
+          # Get basic stack info
+          STACK_DETAILS=$(aws cloudformation describe-stacks --stack-name webserver-stack)
+          echo "Stack details retrieved" >> $GITHUB_STEP_SUMMARY
+          
+          # Extract outputs
+          OUTPUTS=$(echo "$STACK_DETAILS" | jq -c '.Stacks[0].Outputs')
+          VPC_ID=$(echo "$OUTPUTS" | jq -r '.[] | select(.OutputKey=="VpcId") | .OutputValue')
+          SUBNET1_ID=$(echo "$OUTPUTS" | jq -r '.[] | select(.OutputKey=="Subnet1Id") | .OutputValue')
+          SUBNET2_ID=$(echo "$OUTPUTS" | jq -r '.[] | select(.OutputKey=="Subnet2Id") | .OutputValue')
+          SECURITY_GROUP_ID=$(echo "$OUTPUTS" | jq -r '.[] | select(.OutputKey=="SecurityGroupId") | .OutputValue')
+          RESTRICTED_SG_ID=$(echo "$OUTPUTS" | jq -r '.[] | select(.OutputKey=="RestrictedSecurityGroupId") | .OutputValue')
+          
+          # Get VPC details
+          VPC_INFO=$(aws ec2 describe-vpcs --vpc-ids "$VPC_ID")
+          
+          # Get subnet details
+          SUBNETS_INFO=$(aws ec2 describe-subnets --subnet-ids "$SUBNET1_ID" "$SUBNET2_ID")
+          
+          # Get security group details
+          SECURITY_GROUP_INFO=$(aws ec2 describe-security-groups --group-ids "$SECURITY_GROUP_ID")
+          RESTRICTED_SG_INFO=$(aws ec2 describe-security-groups --group-ids "$RESTRICTED_SG_ID")
+          
+          # Get route tables
+          ROUTE_TABLES=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID")
+          
+          # Get internet gateways
+          INTERNET_GATEWAYS=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID")
+          
+          # Create a JSON file with all the details using jq to ensure proper JSON formatting
+          jq -n \
+            --arg stack_name "webserver-stack" \
+            --arg deployment_time "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --arg vpc_id "$VPC_ID" \
+            --arg subnet1_id "$SUBNET1_ID" \
+            --arg subnet2_id "$SUBNET2_ID" \
+            --arg security_group_id "$SECURITY_GROUP_ID" \
+            --arg restricted_sg_id "$RESTRICTED_SG_ID" \
+            --argjson stack_outputs "$OUTPUTS" \
+            --argjson vpc_info "$VPC_INFO" \
+            --argjson subnets_info "$SUBNETS_INFO" \
+            --argjson security_group_info "$SECURITY_GROUP_INFO" \
+            --argjson restricted_sg_info "$RESTRICTED_SG_INFO" \
+            --argjson route_tables "$ROUTE_TABLES" \
+            --argjson internet_gateways "$INTERNET_GATEWAYS" \
+            '{"stack_name": $stack_name, "deployment_time": $deployment_time, "vpc_id": $vpc_id, "subnets": {"subnet1_id": $subnet1_id, "subnet2_id": $subnet2_id}, "security_groups": {"web_server_sg": $security_group_id, "restricted_sg": $restricted_sg_id}, "stack_outputs": $stack_outputs, "vpc_info": $vpc_info, "subnets_info": $subnets_info, "security_groups_info": {"web_server_sg": $security_group_info, "restricted_sg": $restricted_sg_info}, "route_tables": $route_tables, "internet_gateways": $internet_gateways}' > infrastructure_payload.json
+          
+          # Set the payload as output
+          PAYLOAD_ESCAPED=$(cat infrastructure_payload.json | tr -d '\n')
+          echo "webhook_payload=$PAYLOAD_ESCAPED" >> $GITHUB_OUTPUT
+          
+          # Also save detailed information to the step summary
+          echo "## CloudFormation Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "* Stack Name: webserver-stack" >> $GITHUB_STEP_SUMMARY
+          echo "* Deployment Time: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_STEP_SUMMARY
+          echo "* VPC ID: $VPC_ID" >> $GITHUB_STEP_SUMMARY
+          echo "* Subnet 1 ID: $SUBNET1_ID" >> $GITHUB_STEP_SUMMARY
+          echo "* Subnet 2 ID: $SUBNET2_ID" >> $GITHUB_STEP_SUMMARY
+          echo "* Web Server Security Group ID: $SECURITY_GROUP_ID" >> $GITHUB_STEP_SUMMARY
+          echo "* Restricted Security Group ID: $RESTRICTED_SG_ID" >> $GITHUB_STEP_SUMMARY
+          
+          # Show outputs in summary
+          echo "### Stack Outputs" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUTS" | jq '.' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      
+      - name: Send data to n8n webhook
+        run: |
+          # Store payload in a file to avoid shell escaping issues
+          echo '${{ steps.get-outputs.outputs.webhook_payload }}' > payload.json
+          
+          # Validate JSON before sending
+          if jq empty payload.json; then
+            echo "JSON is valid"
+          else
+            echo "ERROR: Invalid JSON payload"
+            cat payload.json
+            exit 1
+          fi
+          
+          # Print payload info
+          echo "Payload size (bytes): $(stat -c%s payload.json)"
+          echo "Payload preview (first 500 chars): $(head -c 500 payload.json)"
+          
+          # Use the exact webhook URL
+          WEBHOOK_URL="https://gfsoz.app.n8n.cloud/webhook/2a1f9361-219c-40f7-9422-82cfa2498bc0"
+          echo "Using exact webhook URL: https://gfsoz.app.n8n.cloud/webhook/248bb861***"
+          
+          # Send with verbose output to see request/response details
+          curl -v -X POST \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: GitHub-Workflow-Action" \
+            -d @payload.json \
+            "${WEBHOOK_URL}" || echo "Webhook call failed with exit code: $?"
