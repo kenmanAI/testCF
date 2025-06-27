@@ -1,0 +1,1242 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to create the security groups of Opentext Servers.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: 'Environment Parameters'
+      Parameters:
+      - Environment
+
+#--------------------------------------------------------------------------------------------------
+#                                             Parameters
+#--------------------------------------------------------------------------------------------------
+Parameters:
+  Environment:
+    Description: Name of the environment
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - PRD
+      - DEV
+      - SIT
+      - FIT
+      - UAT
+      - PRD
+      - TRN
+      - TST
+      - POC
+      - FIT
+      - SEC
+
+#--------------------------------------------------------------------------------------------------
+# Opentext OTExstreamDesignerServer Instance Security Group
+#--------------------------------------------------------------------------------------------------
+Resources:
+  OTExstreamDesignerServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'GFS-${Environment}-OTEXSTREAMDESIGNERSERVER-SG'
+      VpcId: !ImportValue VPCID
+      Tags:
+        - Key: Name
+          Value: !Join ['-',['GFS', !Ref Environment, 'OTEXSTREAMDESIGNERSERVER-SG']]
+        - Key: gfs:puppetrole
+          Value: TBD
+        - Key: gfs:environment
+          Value: !Ref Environment
+        - Key: gfs:product
+          Value: TBD
+
+  OTExstreamDesignerServerSGIngressRDP:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/25"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressRDP0:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressRDP1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Elevated Users Wired
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressRDP2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Elevated Users Wifi
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 3389
+  OTExstreamDesignerServerSGOTPort00:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 29900
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 29900
+  OTExstreamDesignerServerSGOTPort01:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 29900
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 29900
+  OTExstreamDesignerServerSGOTPort06:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 29901
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 29901
+  OTExstreamDesignerServerSGOTPort07:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 29901
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 29901
+  OTExstreamDesignerServerSGOTPort02:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 29900
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 29900
+  OTExstreamDesignerServerSGOTPort03:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 29900
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 29900
+  OTExstreamDesignerServerSGOTPort08:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 29901
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 29901
+  OTExstreamDesignerServerSGOTPort09:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 29901
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 29901
+  OTExstreamDesignerServerSGIngressOTPort10:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 2818
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 2818
+  OTExstreamDesignerServerSGOTPort14:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 2818
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 2818
+  OTExstreamDesignerServerSGOTPort15:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 2919
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 2919
+  OTExstreamDesignerServerSGOTPort16:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 2919
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 2919
+  OTExstreamDesignerServerSGOTPort11:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 2818
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 2818
+  OTExstreamDesignerServerSGOTPort12:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 2818
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 2818
+  OTExstreamDesignerServerSGOTPort17:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 2919
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 2919
+  OTExstreamDesignerServerSGOTPort18:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 2919
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 2919
+  OTExstreamDesignerServerSGOTPort20:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 2720
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 2720
+  OTExstreamDesignerServerSGOTPort21:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 2720
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 2720
+  OTExstreamDesignerServerSGOTPort26:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 2721
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 2721
+  OTExstreamDesignerServerSGOTPort27:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 2721
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 2721
+  OTExstreamDesignerServerSGOTPort22:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 2720
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 2720
+  OTExstreamDesignerServerSGOTPort23:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 2720
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 2720
+  OTExstreamDesignerServerSGOTPort28:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 2721
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 2721
+  OTExstreamDesignerServerSGOTPort29:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 2721
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 2721
+  OTExstreamDesignerServerSGOTPort30:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 2722
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 2722
+  OTExstreamDesignerServerSGOTPort31:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 2722
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 2722
+  OTExstreamDesignerServerSGOTPort36:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 2823
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 2823
+  OTExstreamDesignerServerSGOTPort37:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 2823
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 2823
+  OTExstreamDesignerServerSGOTPort32:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 2722
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 2722
+  OTExstreamDesignerServerSGOTPort33:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 2722
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 2722
+  OTExstreamDesignerServerSGOTPort38:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 2823
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 2823
+  OTExstreamDesignerServerSGOTPort39:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 2823
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 2823
+  OTExstreamDesignerServerSGOTPort40:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/25"
+      ToPort: 8116
+  OTExstreamDesignerServerSGOTPort41:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 8116
+  OTExstreamDesignerServerSGIngressHTTPS01:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 443
+  OTExstreamDesignerServerSGIngressHTTPS02:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 443
+  OTExstreamDesignerServerSGOTPort42:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/25"
+      ToPort: 8116
+  OTExstreamDesignerServerSGOTPort46:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 8116      
+  OTExstreamDesignerServerSGOTPort43:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 8116
+  OTExstreamDesignerServerSGIngressHTTPS03:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 443
+  OTExstreamDesignerServerSGIngressHTTPS04:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 443                             
+  OTExstreamDesignerServerSGIngressSMB01:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from NW1 Elevated Users Wired
+      FromPort: 445
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 445
+  OTExstreamDesignerServerSGIngressSMB02:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from NW1 Elevated Users Wifi
+      FromPort: 445
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 445
+  OTExstreamDesignerServerSGIngressSMB03:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from from workspace
+      FromPort: 445
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 445
+  OTExstreamDesignerServerSGIngressSMB04:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from workspace
+      FromPort: 445
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 445                       
+  OTExstreamDesignerServerSGIngressRDP3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure VPN
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.61.0/24"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressRDP4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.62.0/23"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressRDP7:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from Prisma Access VPN
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.40.0.0/20"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressHTTPS05:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: HTTPS access from workspace
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.0.0.0/8"
+      ToPort: 443
+  OTExstreamDesignerServerSGIngressRDP8:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Workspaces
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.12.0/24"
+      ToPort: 3389
+  OTExstreamDesignerServerSGIngressRDP9:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Workspaces
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.13.0/24"
+      ToPort: 3389
+
+  OTExstreamDesignerServerSGOTPort44:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 8116 Port access from COR VPC for DEV OT ALB
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 8116
+  OTExstreamDesignerServerSGIngressHTTPS06:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 443 Port access from COR VPC for DEV OT ALB
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 443
+  OTExstreamDesignerServerSGOTPort04:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 29900 Port access from COR VPC for DEV OT ALB
+      FromPort: 29900
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 29900
+  OTExstreamDesignerServerSGOTPort05:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 29901 Port access from COR VPC for DEV OT ALB
+      FromPort: 29901
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 29901
+  OTExstreamDesignerServerSGOTPort13:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2818 Port access from COR VPC for DEV OT ALB
+      FromPort: 2818
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 2818
+  OTExstreamDesignerServerSGOTPort19:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2919 Port access from COR VPC for DEV OT ALB
+      FromPort: 2919
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 2919
+  OTExstreamDesignerServerSGOTPort24:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2720 Port access from COR VPC for DEV OT ALB
+      FromPort: 2720
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 2720
+  OTExstreamDesignerServerSGOTPort25:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2919 Port access from COR VPC for DEV OT ALB
+      FromPort: 2721
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 2721
+  OTExstreamDesignerServerSGOTPort34:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2722 Port access from COR VPC for DEV OT ALB
+      FromPort: 2722
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 2722
+  OTExstreamDesignerServerSGOTPort35:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2823 Port access from COR VPC for DEV OT ALB
+      FromPort: 2823
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 2823
+
+  OTExstreamDesignerServerSGOTPort45:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 8116 Port access from DEV VPC for DEV OT ALB
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 8116
+  OTExstreamDesignerServerSGIngressHTTPS07:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 443 Port access from DEV VPC for DEV OT ALB
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 443
+  OTExstreamDesignerServerSGOTPort49:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 29900 Port access from DEV VPC for DEV OT ALB
+      FromPort: 29900
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 29900
+  OTExstreamDesignerServerSGOTPort50:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 29901 Port access from DEV VPC for DEV OT ALB
+      FromPort: 29901
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 29901
+  OTExstreamDesignerServerSGOTPort51:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2818 Port access from DEV VPC for DEV OT ALB
+      FromPort: 2818
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 2818
+  OTExstreamDesignerServerSGOTPort52:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2919 Port access from DEV VPC for DEV OT ALB
+      FromPort: 2919
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 2919
+  OTExstreamDesignerServerSGOTPort53:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2720 Port access from DEV VPC for DEV OT ALB
+      FromPort: 2720
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 2720
+  OTExstreamDesignerServerSGOTPort54:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2919 Port access from DEV VPC for DEV OT ALB
+      FromPort: 2721
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 2721
+  OTExstreamDesignerServerSGOTPort55:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2722 Port access from DEV VPC for DEV OT ALB
+      FromPort: 2722
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 2722
+  OTExstreamDesignerServerSGOTPort56:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 2823 Port access from DEV VPC for DEV OT ALB
+      FromPort: 2823
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 2823
+
+#--------------------------------------------------------------------------------------------------
+# Opentext OTExstreamDesignerWebServer Instance Security Group
+#--------------------------------------------------------------------------------------------------
+
+  OTExstreamDesignerWebServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'GFS-${Environment}-OTExstreamDesignerWebServer-SG'
+      VpcId: !ImportValue VPCID
+      Tags:
+        - Key: Name
+          Value: !Join ['-',['GFS', !Ref Environment, 'OTExstreamDesignerWebServer-SG']]
+        - Key: gfs:puppetrole
+          Value: TBD
+        - Key: gfs:environment
+          Value: !Ref Environment
+        - Key: gfs:product
+          Value: TBD
+
+  OTExstreamDesignerWebServerSGIngressRDP:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/25"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGIngressRDP0:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGIngressSMB1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from AWS 1.0 Developers Workspaces
+      FromPort: 445
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 445
+  OTExstreamDesignerWebServerSGIngressSMB2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from AWS 1.0 Developers Workspaces
+      FromPort: 445
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 445      
+  OTExstreamDesignerWebServerSGIngressRDP1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Elevated Users Wired
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGIngressRDP2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Elevated Users Wifi
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGIngressRDP3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure VPN
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.61.0/24"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGIngressRDP4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.62.0/23"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGIngressRDP7:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from Prisma Access VPN
+      FromPort: 3389
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.40.0.0/20"
+      ToPort: 3389
+  OTExstreamDesignerWebServerSGOTPort45:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 8116 Port access from COR VPC for DEV OT ALB
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 8116
+  OTExstreamDesignerWebServerSGIngressHTTPS01:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 443 Port access from COR VPC for DEV OT ALB
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.16.0/22"
+      ToPort: 443
+
+  OTExstreamDesignerWebServerSGOTPort46:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 8116 Port access from DEV VPC for DEV OT ALB
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 8116
+  OTExstreamDesignerWebServerSGIngressHTTPS03:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 443 Port access from DEV VPC for DEV OT ALB
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 443            
+  OTExstreamDesignerWebServerSGOTPort43:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 8116
+  OTExstreamDesignerWebServerSGOTPort44:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 8116
+  OTExstreamDesignerWebServerSGIngressHTTPS04:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wired
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 443
+  OTExstreamDesignerWebServerSGIngressHTTPS05:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from NW1 Elevated Users Wifi
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 443
+  OTExstreamDesignerWebServerSGOTPort42:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/25"
+      ToPort: 8116
+  OTExstreamDesignerWebServerSGOTPort47:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 8116      
+  OTExstreamDesignerWebServerSGOTPort41:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 8116
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 8116
+  OTExstreamDesignerWebServerSGIngressHTTPS06:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from from workspace
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 443
+  OTExstreamDesignerWebServerSGIngressHTTPS07:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: TomCat access from workspace
+      FromPort: 443
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 443
+
+#--------------------------------------------------------------------------------------------------
+# Opentext OPentext File Server Instance Security Group
+#--------------------------------------------------------------------------------------------------
+
+  OpentextFileServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'GFS-${Environment}-OPENTEXTFILESERVER-SG'
+      VpcId: !ImportValue VPCID
+      Tags:
+        - Key: Name
+          Value: !Join ['-',['GFS', !Ref Environment, 'OPENTEXTFILESERVER-SG']]
+        - Key: gfs:puppetrole
+          Value: TBD
+        - Key: gfs:environment
+          Value: !Ref Environment
+        - Key: gfs:product
+          Value: TBD
+
+  OpentextFileServerSGIngressRDP:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/25"
+      ToPort: 3389
+  OpentextFileServerSGIngressRDP0:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 3389
+  OpentextFileServerSGIngressRDP1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Elevated Users Wired
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 3389
+  OpentextFileServerSGIngressRDP2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Elevated Users Wifi
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 3389
+  OpentextFileServerSGIngressRDP3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure VPN
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.61.0/24"
+      ToPort: 3389
+  OpentextFileServerSGIngressRDP4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.62.0/23"
+      ToPort: 3389
+  OpentextFileServerSGIngressRDP7:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from Prisma Access VPN
+      FromPort: 3389
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.40.0.0/20"
+      ToPort: 3389
+
+  OpentextFileServerSGIngressSMB01:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from NW1 Elevated Users Wired
+      FromPort: 445
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.58.0/24"
+      ToPort: 445
+  OpentextFileServerSGIngressSMB02:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from NW1 Elevated Users Wifi
+      FromPort: 445
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "172.21.59.0/24"
+      ToPort: 445
+  OpentextFileServerSGIngressSMB03:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from from workspace
+      FromPort: 445
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 445
+  OpentextFileServerSGIngressSMB04:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: SMB access from workspace
+      FromPort: 445
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.14.0/24"
+      ToPort: 445
+
+#--------------------------------------------------------------------------------------------------
+# Opentext CommonDB Instances Security Group
+#--------------------------------------------------------------------------------------------------
+
+  OpentextCommonDBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub 'GFS-${Environment}-OPENTEXTCOMMONDB-SG'
+      VpcId: !ImportValue VPCID
+      Tags:
+        - Key: Name
+          Value: !Join ['-',['GFS', !Ref Environment, 'OPENTEXTCOMMONDB-SG']]
+        - Key: gfs:puppetrole
+          Value: TBD
+        - Key: gfs:environment
+          Value: !Ref Environment
+        - Key: gfs:product
+          Value: TBD
+
+  OpentextCommonDBSGIngressRDP3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure VPN
+      FromPort: 3389
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "172.21.61.0/24"
+      ToPort: 3389
+  OpentextCommonDBSGIngressRDP4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from NW1 Infrastructure
+      FromPort: 3389
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "172.21.62.0/23"
+      ToPort: 3389
+  OpentextCommonDBSGIngressRDP7:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from Prisma Access VPN
+      FromPort: 3389
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.40.0.0/20"
+      ToPort: 3389
+  OpentextCommonDBSGIngressRDP8:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.0/24"
+      ToPort: 3389
+  OpentextCommonDBSGIngressRDP9:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: RDP access from AWS 1.0 Developers Workspaces
+      FromPort: 3389
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.200.15.128/25"
+      ToPort: 3389      
+  OpentextCommonDBSGIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: OpentextCommon DB connection
+      FromPort: 1382
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.99.19.26/32"
+      ToPort: 1382
+
+  OpentextCommonDBSGIngressFromCommonExtream1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 1382 from Common Exstream-1 Server
+      FromPort: 1382
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.99.18.39/32"
+      ToPort: 1382
+
+  OpentextCommonDBSGIngressFromDevVPC:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 1382 from DEV VPC
+      FromPort: 1382
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.99.96.0/20"
+      ToPort: 1382
+
+#--------------------------------------------------------------------------------------------------
+# CIS Scan Rule
+#--------------------------------------------------------------------------------------------------
+
+  OpentextCommonDBCISScanSG:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 1382 port access for CIS Scan
+      FromPort: 1382
+      GroupId: !Ref OpentextCommonDBSG
+      IpProtocol: tcp
+      CidrIp : "10.200.10.115/32"
+      ToPort: 1382
+
+  OTExstreamDesignerServerCISCanSGPort5002:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 5002 port access for CIS Scan
+      FromPort: 5002
+      GroupId: !Ref OTExstreamDesignerServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.10.115/32"
+      ToPort: 5002
+
+  OTExstreamDesignerWebServerCISScanSGPort5986:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 5986 port access for CIS Scan
+      FromPort: 5986
+      GroupId: !Ref OTExstreamDesignerWebServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.10.115/32"
+      ToPort: 5986
+
+  OpentextFileServerCISCanSGPort5002:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 5002 port access for CIS Scan
+      FromPort: 5002
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.10.115/32"
+      ToPort: 5002
+
+  OpentextFileServerCISScanSGPort5986:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: 5986 port access for CIS Scan
+      FromPort: 5986
+      GroupId: !Ref OpentextFileServerSG
+      IpProtocol: tcp
+      CidrIp : "10.200.10.115/32"
+      ToPort: 5986
+
+#--------------------------------------------------------------------------------------------------
+# Outputs
+#--------------------------------------------------------------------------------------------------
+Outputs:
+  OTExstreamDesignerServerSGOP:
+    Description: Opentext OTExstreamDesignerServer SG ID
+    Value: !Ref OTExstreamDesignerServerSG
+    Export:
+      Name: !Sub GFS-${Environment}-OTExstreamDesignerServer-SG-ID
+
+  OTExstreamDesignerWebServerSGOP:
+    Description: Opentext OTExstreamDesignerWebServer SG ID
+    Value: !Ref OTExstreamDesignerWebServerSG
+    Export:
+      Name: !Sub GFS-${Environment}-OTExstreamDesignerWebServer-SG-ID
+
+  OpentextFileServerSGOP:
+    Description: Opentext OpentextFileServer SG ID
+    Value: !Ref OpentextFileServerSG
+    Export:
+      Name: !Sub GFS-${Environment}-OpentextFileServer-SG-ID
+
+  OpentextCommonDBSGOP:
+    Description: Opentext OpentextCommonDB SG ID
+    Value: !Ref OpentextCommonDBSG
+    Export:
+      Name: !Sub GFS-${Environment}-OpentextCommonDB-SG-ID
